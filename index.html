@@ -41,6 +41,20 @@
     </button>
   </main>
 
+  <!-- PIN Modal -->
+  <div id="pin-modal" class="modal-overlay" hidden>
+    <div class="modal">
+      <h2 id="modal-title">Enter PIN</h2>
+      <p id="modal-subtitle" class="modal-sub"></p>
+      <input type="password" id="pin-input" class="pin-input" maxlength="10" placeholder="****" inputmode="numeric" autocomplete="off">
+      <p id="modal-error" class="modal-error" hidden>Wrong PIN!</p>
+      <div class="modal-buttons">
+        <button id="modal-cancel" class="btn btn-modal btn-modal-cancel">Cancel</button>
+        <button id="modal-confirm" class="btn btn-modal btn-modal-confirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
   <footer>
     <p>Made with 🪰 and ❤️</p>
   </footer>

@@ -50,15 +50,20 @@ header {
   position: absolute;
   top: 12px;
   right: 12px;
+  z-index: 100;
   background: rgba(255,255,255,0.25);
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 1.2rem;
+  width: 48px;
+  height: 48px;
+  font-size: 1.3rem;
   cursor: pointer;
   transition: background var(--transition), transform var(--transition);
   -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .admin-toggle:hover {
@@ -395,6 +400,114 @@ main {
 /* Overflow hidden on body during fly animation to prevent scrollbars */
 body.fly-animating {
   overflow-x: hidden;
+}
+
+/* ===== PIN Modal ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+}
+
+.modal-overlay[hidden] {
+  display: none;
+}
+
+.modal {
+  background: var(--color-card);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  padding: 2rem;
+  width: 100%;
+  max-width: 320px;
+  text-align: center;
+  animation: modal-in 0.25s ease;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.9) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal h2 {
+  font-size: 1.4rem;
+  font-weight: 900;
+  margin-bottom: 0.25rem;
+  color: var(--color-text);
+}
+
+.modal-sub {
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+  margin-bottom: 1rem;
+}
+
+.pin-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 3px solid var(--color-primary);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 1.5rem;
+  font-weight: 900;
+  text-align: center;
+  letter-spacing: 0.3em;
+  color: var(--color-text);
+  background: var(--color-bg);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.pin-input:focus {
+  border-color: var(--color-accent);
+}
+
+.modal-error {
+  color: var(--color-danger);
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.modal-error[hidden] {
+  display: none;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.btn-modal {
+  flex: 1;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border-radius: 12px;
+}
+
+.btn-modal-cancel {
+  background: #E0E0E0;
+  color: var(--color-text);
+}
+
+.btn-modal-cancel:hover {
+  background: #BDBDBD;
+}
+
+.btn-modal-confirm {
+  background: var(--color-accent);
+  color: white;
+}
+
+.btn-modal-confirm:hover {
+  background: var(--color-accent-dark);
 }
 
 /* ===== Footer ===== */

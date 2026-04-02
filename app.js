@@ -16,6 +16,8 @@ function saveFriends(friends) {
 
 // ===== Admin Mode =====
 let isAdmin = false;
+let modalStep = null; // 'set-pin', 'confirm-pin', 'enter-pin'
+let pendingPin = '';
 
 function getStoredPin() {
   return localStorage.getItem(PIN_KEY);
@@ -26,6 +28,7 @@ function setStoredPin(pin) {
 }
 
 function applyAdminMode() {
+  const adminToggle = document.getElementById('admin-toggle');
   if (isAdmin) {
     document.body.classList.add('admin-mode');
     adminToggle.textContent = '🔓';
@@ -38,9 +41,26 @@ function applyAdminMode() {
   render();
 }
 
+// ===== PIN Modal =====
+function showModal(title, subtitle) {
+  const modal = document.getElementById('pin-modal');
+  const pinInput = document.getElementById('pin-input');
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-subtitle').textContent = subtitle || '';
+  document.getElementById('modal-error').hidden = true;
+  pinInput.value = '';
+  modal.hidden = false;
+  setTimeout(() => pinInput.focus(), 50);
+}
+
+function hideModal() {
+  document.getElementById('pin-modal').hidden = true;
+  modalStep = null;
+  pendingPin = '';
+}
+
 function handleAdminToggle() {
   if (isAdmin) {
-    // Log out of admin
     isAdmin = false;
     sessionStorage.removeItem('fly-admin-session');
     applyAdminMode();
@@ -50,30 +70,52 @@ function handleAdminToggle() {
   const storedPin = getStoredPin();
 
   if (!storedPin) {
-    // First time: set a new PIN
-    const newPin = prompt('Set your admin PIN (4+ digits):');
-    if (!newPin || newPin.length < 4) {
-      alert('PIN must be at least 4 characters.');
+    modalStep = 'set-pin';
+    showModal('Set Admin PIN', 'Choose a PIN (4+ characters)');
+  } else {
+    modalStep = 'enter-pin';
+    showModal('Enter Admin PIN', 'Type your PIN to unlock');
+  }
+}
+
+function handleModalConfirm() {
+  const pinInput = document.getElementById('pin-input');
+  const errorEl = document.getElementById('modal-error');
+  const value = pinInput.value;
+
+  if (modalStep === 'set-pin') {
+    if (value.length < 4) {
+      errorEl.textContent = 'PIN must be at least 4 characters!';
+      errorEl.hidden = false;
       return;
     }
-    const confirmPin = prompt('Confirm your PIN:');
-    if (newPin !== confirmPin) {
-      alert('PINs don\'t match. Try again.');
+    pendingPin = value;
+    modalStep = 'confirm-pin';
+    showModal('Confirm PIN', 'Type it again to confirm');
+
+  } else if (modalStep === 'confirm-pin') {
+    if (value !== pendingPin) {
+      errorEl.textContent = 'PINs don\'t match! Try again.';
+      errorEl.hidden = false;
+      pinInput.value = '';
       return;
     }
-    setStoredPin(newPin);
+    setStoredPin(pendingPin);
     isAdmin = true;
     sessionStorage.setItem('fly-admin-session', '1');
+    hideModal();
     applyAdminMode();
-  } else {
-    // PIN exists: ask for it
-    const entered = prompt('Enter admin PIN:');
-    if (entered === storedPin) {
+
+  } else if (modalStep === 'enter-pin') {
+    if (value === getStoredPin()) {
       isAdmin = true;
       sessionStorage.setItem('fly-admin-session', '1');
+      hideModal();
       applyAdminMode();
-    } else if (entered !== null) {
-      alert('Wrong PIN!');
+    } else {
+      errorEl.textContent = 'Wrong PIN!';
+      errorEl.hidden = false;
+      pinInput.value = '';
     }
   }
 }
@@ -87,7 +129,6 @@ const nameInput = document.getElementById('friend-name');
 const grid = document.getElementById('friends-grid');
 const emptyState = document.getElementById('empty-state');
 const clearAllBtn = document.getElementById('clear-all-btn');
-const adminToggle = document.getElementById('admin-toggle');
 
 // ===== Render =====
 function render() {
@@ -308,7 +349,18 @@ grid.addEventListener('click', (e) => {
 });
 
 clearAllBtn.addEventListener('click', clearAll);
-adminToggle.addEventListener('click', handleAdminToggle);
+
+document.getElementById('admin-toggle').addEventListener('click', handleAdminToggle);
+document.getElementById('modal-cancel').addEventListener('click', hideModal);
+document.getElementById('modal-confirm').addEventListener('click', handleModalConfirm);
+document.getElementById('pin-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') handleModalConfirm();
+  if (e.key === 'Escape') hideModal();
+});
+// Close modal on overlay click
+document.getElementById('pin-modal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) hideModal();
+});
 
 // ===== Init =====
 // Restore admin session if still active in this tab
