@@ -1,23 +1,21 @@
-// ===== Storage =====
-const STORAGE_KEY = 'fly-counter-friends';
+// ===== Firebase Setup =====
+const firebaseConfig = {
+  apiKey: "AIzaSyBc9VFC5_UBl_qg6lM2xftWpClcK5QAAuw",
+  authDomain: "fly-app-2e202.firebaseapp.com",
+  databaseURL: "https://fly-app-2e202-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "fly-app-2e202",
+  storageBucket: "fly-app-2e202.firebasestorage.app",
+  messagingSenderId: "1061102905067",
+  appId: "1:1061102905067:web:9da0a1f2138e58e09880ae",
+  measurementId: "G-7ZMY7WEK46"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const friendsRef = db.ref('friends');
+
+// ===== Local Storage (PIN only — stays per device) =====
 const PIN_KEY = 'fly-counter-pin';
-
-function loadFriends() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  } catch {
-    return [];
-  }
-}
-
-function saveFriends(friends) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(friends));
-}
-
-// ===== Admin Mode =====
-let isAdmin = false;
-let modalStep = null; // 'set-pin', 'confirm-pin', 'enter-pin'
-let pendingPin = '';
 
 function getStoredPin() {
   return localStorage.getItem(PIN_KEY);
@@ -26,6 +24,11 @@ function getStoredPin() {
 function setStoredPin(pin) {
   localStorage.setItem(PIN_KEY, pin);
 }
+
+// ===== Admin Mode =====
+let isAdmin = false;
+let modalStep = null;
+let pendingPin = '';
 
 function applyAdminMode() {
   const adminToggle = document.getElementById('admin-toggle');
@@ -121,7 +124,7 @@ function handleModalConfirm() {
 }
 
 // ===== State =====
-let friends = loadFriends();
+let friends = [];
 
 // ===== DOM References =====
 const form = document.getElementById('add-friend-form');
@@ -129,6 +132,22 @@ const nameInput = document.getElementById('friend-name');
 const grid = document.getElementById('friends-grid');
 const emptyState = document.getElementById('empty-state');
 const clearAllBtn = document.getElementById('clear-all-btn');
+
+// ===== Firebase → Render (real-time listener) =====
+friendsRef.on('value', (snapshot) => {
+  const data = snapshot.val();
+  // Firebase stores objects, convert to array
+  if (data) {
+    friends = Object.keys(data).map(key => ({
+      id: key,
+      name: data[key].name,
+      count: data[key].count || 0
+    }));
+  } else {
+    friends = [];
+  }
+  render();
+});
 
 // ===== Render =====
 function render() {
@@ -180,7 +199,7 @@ function spawnFlyAnimation(cardEl) {
   const targetX = cardRect.left + cardRect.width / 2;
   const targetY = cardRect.top + cardRect.height / 3;
 
-  const flyCount = 1 + Math.floor(Math.random() * 2); // 1-2 flies
+  const flyCount = 1 + Math.floor(Math.random() * 2);
 
   document.body.classList.add('fly-animating');
 
@@ -196,33 +215,19 @@ function launchOneFly(targetX, targetY, cardEl) {
   fly.className = 'flying-fly';
   fly.textContent = '🪰';
 
-  // Pick a random edge to start from
   const edge = Math.floor(Math.random() * 4);
   let startX, startY;
   switch (edge) {
-    case 0: // top
-      startX = Math.random() * window.innerWidth;
-      startY = -40;
-      break;
-    case 1: // right
-      startX = window.innerWidth + 40;
-      startY = Math.random() * window.innerHeight;
-      break;
-    case 2: // bottom
-      startX = Math.random() * window.innerWidth;
-      startY = window.innerHeight + 40;
-      break;
-    case 3: // left
-      startX = -40;
-      startY = Math.random() * window.innerHeight;
-      break;
+    case 0: startX = Math.random() * window.innerWidth; startY = -40; break;
+    case 1: startX = window.innerWidth + 40; startY = Math.random() * window.innerHeight; break;
+    case 2: startX = Math.random() * window.innerWidth; startY = window.innerHeight + 40; break;
+    case 3: startX = -40; startY = Math.random() * window.innerHeight; break;
   }
 
   fly.style.left = startX + 'px';
   fly.style.top = startY + 'px';
   document.body.appendChild(fly);
 
-  // Build a zigzag path with 3-4 waypoints
   const steps = 3 + Math.floor(Math.random() * 2);
   const keyframes = [{ left: startX + 'px', top: startY + 'px', offset: 0 }];
 
@@ -246,7 +251,6 @@ function launchOneFly(targetX, targetY, cardEl) {
   anim.onfinish = () => {
     fly.remove();
 
-    // Splat effect
     const splat = document.createElement('span');
     splat.className = 'fly-splat';
     splat.textContent = '💥';
@@ -255,12 +259,10 @@ function launchOneFly(targetX, targetY, cardEl) {
     document.body.appendChild(splat);
     setTimeout(() => splat.remove(), 500);
 
-    // Card wiggle
     cardEl.classList.remove('card-hit');
-    void cardEl.offsetWidth; // reflow to restart animation
+    void cardEl.offsetWidth;
     cardEl.classList.add('card-hit');
 
-    // Count pop
     const countEl = cardEl.querySelector('.count');
     if (countEl) {
       countEl.classList.remove('count-pop');
@@ -270,34 +272,30 @@ function launchOneFly(targetX, targetY, cardEl) {
   };
 }
 
-// ===== Actions =====
+// ===== Actions (write to Firebase) =====
 function addFriend(name) {
   const trimmed = name.trim();
   if (!trimmed) return;
-  friends.push({ id: generateId(), name: trimmed, count: 0 });
-  saveFriends(friends);
-  render();
+  const id = generateId();
+  friendsRef.child(id).set({ name: trimmed, count: 0 });
 }
 
 function increment(id) {
   const friend = friends.find(f => f.id === id);
   if (!friend) return;
 
-  // Find the card element before re-rendering
+  // Trigger animation on the current card
   const card = grid.querySelector(`[data-id="${id}"]`)?.closest('.friend-card');
   if (card) spawnFlyAnimation(card);
 
-  friend.count++;
-  saveFriends(friends);
-  render();
+  // Update Firebase (the real-time listener will re-render)
+  friendsRef.child(id).update({ count: friend.count + 1 });
 }
 
 function decrement(id) {
   const friend = friends.find(f => f.id === id);
   if (friend && friend.count > 0) {
-    friend.count--;
-    saveFriends(friends);
-    render();
+    friendsRef.child(id).update({ count: friend.count - 1 });
   }
 }
 
@@ -306,25 +304,19 @@ function resetCount(id) {
   if (!friend) return;
   if (friend.count === 0) return;
   if (!confirm(`Reset ${friend.name}'s fly count to 0?`)) return;
-  friend.count = 0;
-  saveFriends(friends);
-  render();
+  friendsRef.child(id).update({ count: 0 });
 }
 
 function removeFriend(id) {
   const friend = friends.find(f => f.id === id);
   if (!friend) return;
   if (!confirm(`Remove ${friend.name}?`)) return;
-  friends = friends.filter(f => f.id !== id);
-  saveFriends(friends);
-  render();
+  friendsRef.child(id).remove();
 }
 
 function clearAll() {
   if (!confirm('Remove ALL friends and reset everything?')) return;
-  friends = [];
-  saveFriends(friends);
-  render();
+  friendsRef.remove();
 }
 
 // ===== Event Listeners =====
@@ -357,13 +349,11 @@ document.getElementById('pin-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') handleModalConfirm();
   if (e.key === 'Escape') hideModal();
 });
-// Close modal on overlay click
 document.getElementById('pin-modal').addEventListener('click', (e) => {
   if (e.target === e.currentTarget) hideModal();
 });
 
 // ===== Init =====
-// Restore admin session if still active in this tab
 if (sessionStorage.getItem('fly-admin-session') === '1' && getStoredPin()) {
   isAdmin = true;
 }
