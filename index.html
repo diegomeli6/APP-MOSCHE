@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fly Counter 🪰</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🪰 Fly Counter 🪰</h1>
+    <p class="subtitle">Track flies in your friends' ears!</p>
+  </header>
+
+  <main>
+    <form id="add-friend-form" class="add-friend">
+      <input
+        type="text"
+        id="friend-name"
+        placeholder="Friend's name..."
+        autocomplete="off"
+        maxlength="30"
+        required
+      >
+      <button type="submit" class="btn btn-add">+ Add Friend</button>
+    </form>
+
+    <div id="friends-grid" class="friends-grid"></div>
+
+    <div id="empty-state" class="empty-state">
+      <span class="empty-fly">🪰</span>
+      <p>No friends yet!<br>Add someone to start counting flies.</p>
+    </div>
+
+    <button id="clear-all-btn" class="btn btn-clear-all" hidden>
+      🗑️ Clear All
+    </button>
+  </main>
+
+  <footer>
+    <p>Made with 🪰 and ❤️</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

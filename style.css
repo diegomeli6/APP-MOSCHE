@@ -1,0 +1,391 @@
+/* ===== CSS Variables ===== */
+:root {
+  --color-primary: #FFCA28;
+  --color-primary-dark: #F5B800;
+  --color-accent: #FF7043;
+  --color-accent-dark: #E64A19;
+  --color-bg: #FFF8E1;
+  --color-card: #FFFFFF;
+  --color-text: #3E2723;
+  --color-text-light: #795548;
+  --color-danger: #EF5350;
+  --color-danger-dark: #C62828;
+  --color-success: #66BB6A;
+  --radius: 16px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.15);
+  --transition: 0.2s ease;
+}
+
+/* ===== Reset & Base ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== Header ===== */
+header {
+  text-align: center;
+  padding: 2rem 1rem 1rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  color: white;
+  box-shadow: var(--shadow);
+}
+
+header h1 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin-top: 0.25rem;
+}
+
+/* ===== Main ===== */
+main {
+  flex: 1;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2rem;
+}
+
+/* ===== Add Friend Form ===== */
+.add-friend {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.add-friend input {
+  flex: 1;
+  padding: 0.85rem 1.1rem;
+  border: 3px solid var(--color-primary);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  background: var(--color-card);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.add-friend input:focus {
+  border-color: var(--color-accent);
+}
+
+.add-friend input::placeholder {
+  color: var(--color-text-light);
+  font-weight: 400;
+}
+
+/* ===== Buttons ===== */
+.btn {
+  border: none;
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform var(--transition), background var(--transition), box-shadow var(--transition);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.btn:active {
+  transform: scale(0.95);
+}
+
+.btn-add {
+  padding: 0.85rem 1.4rem;
+  background: var(--color-primary);
+  color: var(--color-text);
+  font-size: 1rem;
+  box-shadow: var(--shadow);
+  white-space: nowrap;
+}
+
+.btn-add:hover {
+  background: var(--color-primary-dark);
+  box-shadow: var(--shadow-hover);
+}
+
+/* ===== Friends Grid ===== */
+.friends-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+/* ===== Friend Card ===== */
+.friend-card {
+  background: var(--color-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+  animation: card-in 0.3s ease;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.friend-card .fly-deco {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 1.4rem;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.friend-card .name {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--color-text);
+  text-align: center;
+  word-break: break-word;
+}
+
+.friend-card .count {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: var(--color-accent);
+  line-height: 1;
+  min-width: 80px;
+  text-align: center;
+}
+
+.friend-card .counter-controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.btn-count {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+}
+
+.btn-count.plus {
+  background: var(--color-success);
+  color: white;
+}
+
+.btn-count.plus:hover {
+  background: #4CAF50;
+  box-shadow: var(--shadow-hover);
+}
+
+.btn-count.minus {
+  background: #E0E0E0;
+  color: var(--color-text);
+}
+
+.btn-count.minus:hover {
+  background: #BDBDBD;
+}
+
+.friend-card .card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.btn-small {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8rem;
+  border-radius: 8px;
+}
+
+.btn-reset {
+  background: var(--color-primary);
+  color: var(--color-text);
+}
+
+.btn-reset:hover {
+  background: var(--color-primary-dark);
+}
+
+.btn-remove {
+  background: var(--color-danger);
+  color: white;
+}
+
+.btn-remove:hover {
+  background: var(--color-danger-dark);
+}
+
+/* ===== Empty State ===== */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--color-text-light);
+}
+
+.empty-state .empty-fly {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 1rem;
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/* ===== Clear All Button ===== */
+.btn-clear-all {
+  display: block;
+  margin: 2rem auto 0;
+  padding: 0.75rem 1.5rem;
+  background: var(--color-danger);
+  color: white;
+  font-size: 0.95rem;
+  box-shadow: var(--shadow);
+}
+
+.btn-clear-all:hover {
+  background: var(--color-danger-dark);
+  box-shadow: var(--shadow-hover);
+}
+
+/* ===== Flying Fly Animation ===== */
+.flying-fly {
+  position: fixed;
+  font-size: 2.2rem;
+  z-index: 9999;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  animation: buzz 0.15s ease-in-out infinite alternate;
+}
+
+@keyframes buzz {
+  0%   { transform: rotate(-18deg) scale(1); }
+  100% { transform: rotate(18deg) scale(1.08); }
+}
+
+/* Splat when fly arrives */
+.fly-splat {
+  position: fixed;
+  font-size: 1.6rem;
+  z-index: 9999;
+  pointer-events: none;
+  animation: splat 0.45s ease-out forwards;
+}
+
+@keyframes splat {
+  0%   { transform: scale(1.5); opacity: 1; }
+  50%  { transform: scale(2.2) rotate(20deg); opacity: 0.7; }
+  100% { transform: scale(0.2) rotate(45deg); opacity: 0; }
+}
+
+/* Count number bounce on increment */
+.count-pop {
+  animation: count-bounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes count-bounce {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.4); color: #E64A19; }
+  70%  { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+/* Card wiggle when fly lands */
+.card-hit {
+  animation: card-wiggle 0.4s ease;
+}
+
+@keyframes card-wiggle {
+  0%   { transform: rotate(0); }
+  20%  { transform: rotate(-2deg); }
+  40%  { transform: rotate(2.5deg); }
+  60%  { transform: rotate(-1.5deg); }
+  80%  { transform: rotate(1deg); }
+  100% { transform: rotate(0); }
+}
+
+/* Overflow hidden on body during fly animation to prevent scrollbars */
+body.fly-animating {
+  overflow-x: hidden;
+}
+
+/* ===== Footer ===== */
+footer {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  color: var(--color-text-light);
+  font-size: 0.9rem;
+}
+
+/* ===== Responsive ===== */
+
+/* Tablet: 2 columns */
+@media (min-width: 560px) {
+  .friends-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  header h1 {
+    font-size: 2.6rem;
+  }
+}
+
+/* Desktop: 3 columns */
+@media (min-width: 860px) {
+  .friends-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  main {
+    padding: 2rem 1.5rem 3rem;
+  }
+
+  header {
+    padding: 2.5rem 1rem 1.5rem;
+  }
+
+  header h1 {
+    font-size: 3rem;
+  }
+}
