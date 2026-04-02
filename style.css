@@ -42,6 +42,53 @@ header {
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
   color: white;
   box-shadow: var(--shadow);
+  position: relative;
+}
+
+/* ===== Admin Toggle ===== */
+.admin-toggle {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255,255,255,0.25);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.admin-toggle:hover {
+  background: rgba(255,255,255,0.4);
+}
+
+.admin-toggle:active {
+  transform: scale(0.9);
+}
+
+.admin-toggle.unlocked {
+  background: rgba(255,255,255,0.5);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.4);
+}
+
+/* ===== Visitor Mode: hide admin-only elements ===== */
+body:not(.admin-mode) .add-friend,
+body:not(.admin-mode) .btn-clear-all,
+body:not(.admin-mode) .card-actions,
+body:not(.admin-mode) .btn-count.minus {
+  display: none !important;
+}
+
+body:not(.admin-mode) .empty-state p {
+  font-size: 1.1rem;
+}
+
+/* Visitor empty state override */
+body:not(.admin-mode) .empty-state {
+  display: none;
 }
 
 header h1 {

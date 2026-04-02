@@ -1,5 +1,6 @@
 // ===== Storage =====
 const STORAGE_KEY = 'fly-counter-friends';
+const PIN_KEY = 'fly-counter-pin';
 
 function loadFriends() {
   try {
@@ -13,6 +14,70 @@ function saveFriends(friends) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(friends));
 }
 
+// ===== Admin Mode =====
+let isAdmin = false;
+
+function getStoredPin() {
+  return localStorage.getItem(PIN_KEY);
+}
+
+function setStoredPin(pin) {
+  localStorage.setItem(PIN_KEY, pin);
+}
+
+function applyAdminMode() {
+  if (isAdmin) {
+    document.body.classList.add('admin-mode');
+    adminToggle.textContent = '🔓';
+    adminToggle.classList.add('unlocked');
+  } else {
+    document.body.classList.remove('admin-mode');
+    adminToggle.textContent = '🔒';
+    adminToggle.classList.remove('unlocked');
+  }
+  render();
+}
+
+function handleAdminToggle() {
+  if (isAdmin) {
+    // Log out of admin
+    isAdmin = false;
+    sessionStorage.removeItem('fly-admin-session');
+    applyAdminMode();
+    return;
+  }
+
+  const storedPin = getStoredPin();
+
+  if (!storedPin) {
+    // First time: set a new PIN
+    const newPin = prompt('Set your admin PIN (4+ digits):');
+    if (!newPin || newPin.length < 4) {
+      alert('PIN must be at least 4 characters.');
+      return;
+    }
+    const confirmPin = prompt('Confirm your PIN:');
+    if (newPin !== confirmPin) {
+      alert('PINs don\'t match. Try again.');
+      return;
+    }
+    setStoredPin(newPin);
+    isAdmin = true;
+    sessionStorage.setItem('fly-admin-session', '1');
+    applyAdminMode();
+  } else {
+    // PIN exists: ask for it
+    const entered = prompt('Enter admin PIN:');
+    if (entered === storedPin) {
+      isAdmin = true;
+      sessionStorage.setItem('fly-admin-session', '1');
+      applyAdminMode();
+    } else if (entered !== null) {
+      alert('Wrong PIN!');
+    }
+  }
+}
+
 // ===== State =====
 let friends = loadFriends();
 
@@ -22,6 +87,7 @@ const nameInput = document.getElementById('friend-name');
 const grid = document.getElementById('friends-grid');
 const emptyState = document.getElementById('empty-state');
 const clearAllBtn = document.getElementById('clear-all-btn');
+const adminToggle = document.getElementById('admin-toggle');
 
 // ===== Render =====
 function render() {
@@ -242,6 +308,11 @@ grid.addEventListener('click', (e) => {
 });
 
 clearAllBtn.addEventListener('click', clearAll);
+adminToggle.addEventListener('click', handleAdminToggle);
 
 // ===== Init =====
-render();
+// Restore admin session if still active in this tab
+if (sessionStorage.getItem('fly-admin-session') === '1' && getStoredPin()) {
+  isAdmin = true;
+}
+applyAdminMode();
